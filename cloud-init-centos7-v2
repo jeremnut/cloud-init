@@ -1,0 +1,33 @@
+hostname: test01-ci
+fqdn: test01-ci.int.virtualy-labs.com
+manage_etc_hosts: true
+users:
+  - name: "admin"
+    groups: sudo
+    shell: /bin/bash
+    lock_passwd: false
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+chpasswd:
+ list: |
+   admin:changeme
+ expire: False
+network:
+  version: 2
+  ethernets:
+    eth0:
+      # match:
+      #   name: eth0
+      # dhcp4: false
+      # dhcp6: false
+      addresses: 
+        - 192.168.13.109/24
+      gateway4: 192.168.13.1
+      nameservers:
+        search: [int.virtualy-labs.com]
+        addresses: [192.168.1.31]
+  # install Apache 
+packages:
+  - httpd
+runcmd:
+  - [ systemctl, enable, httpd.service ]
+  - [ systemctl, start, httpd.service ]
