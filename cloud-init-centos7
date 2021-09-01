@@ -1,0 +1,40 @@
+#cloud-config
+password: changeme
+disable_root: False
+ssh_pwauth: True
+hostname: test01-ci
+fqdn: test01-ci.int.virtualy-labs.com
+manage_etc_hosts: true
+package_upgrade: true
+users:
+  - name: "admin"
+    groups: sudo
+    shell: /bin/bash
+    lock_passwd: false
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+  - name: nutanix
+    groups: wheel
+    lock_passwd: false
+    passwd: $1$2LS4lW9G$RitqtPCJl1lJtGLM78oLY.
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALLchpasswd:
+ list: |
+   admin:changeme
+ expire: False
+write_files:
+  - path: /etc/sysconfig/network-scripts/ifcfg-eth0
+    content: |
+      DEVICE=eth0
+      TYPE=Ethernet
+      ONBOOT=yes
+      BOOTPROTO=none
+      IPADDR=192.168.13.102
+      NETMASK=255.255.255.0
+      GATEWAY=192.168.13.1
+      DOMAIN=int.virtualy-labs.com
+      DNS1=192.168.1.31
+runcmd:
+  - systemctl disable NetworkManager kdump
+  - systemctl stop NetworkManager kdump
+  - systemctl enable network.service
+  - systemctl restart network
