@@ -27,30 +27,37 @@ write_files:
       GATEWAY=192.168.13.1
       DOMAIN=int.virtualy-labs.com
       DNS1=192.168.1.31
+write_files:
+  - path: /etc/yum.repos.d/CentOS-Base.repo
+    owner: root:root
+    permissions: '0444'
+    content: |
+      # installed by cloud-init
+      [base]
+      name=CentOS-$releasever - Base
+      baseurl=http://mirrors.cat.pdx.edu/centos/$releasever/os/$basearch/
+      gpgcheck=1
+      gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+      #released updates 
+      [updates]
+      name=CentOS-$releasever - Updates
+      baseurl=http://mirrors.cat.pdx.edu/centos/$releasever/updates/$basearch/
+      gpgcheck=1
+      gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+      #additional packages that may be useful
+      [extras]
+      name=CentOS-$releasever - Extras
+      baseurl=http://mirrors.cat.pdx.edu/centos/$releasever/extras/$basearch/
+      gpgcheck=1
+      gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7  
+
+# install Apache 
+packages:
+  - httpd
 runcmd:
   - systemctl disable NetworkManager kdump
   - systemctl stop NetworkManager kdump
   - systemctl enable network.service
-  - systemctl restart network
-yum_repos:
-# The name of the repository
-  epel-testing:
-    # Any repository configuration options
-    # See: man yum.conf
-    #
-    # This one is required!
-    baseurl: http://download.fedoraproject.org/pub/epel/testing/7/$basearch
-    enabled: false
-    failovermethod: priority
-    gpgcheck: true
-    gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL
-    name: Extra Packages for Enterprise Linux 7 - Testing
- # update all installed packages
-package_upgrade: true
-
-# install Apache and PostgreSQL
-packages:
-  - httpd
-  - php
-  - postgresql
-  - postgresql-server
+  - systemctl restart network.service
+  - [ systemctl, enable, httpd.service ]
+  - [ systemctl, start, httpd.service ]
