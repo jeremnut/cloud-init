@@ -5,16 +5,15 @@ ssh_pwauth: True
 hostname: test01-ci
 fqdn: test01-ci.int.virtualy-labs.com
 manage_etc_hosts: true
-package_upgrade: true
 users:
-  - name: nutanix
-    groups: wheel
-    lock_passwd: false
-    passwd: $1$2LS4lW9G$RitqtPCJl1lJtGLM78oLY.
+  - name: "admin"
+    groups: sudo
     shell: /bin/bash
-    sudo: ALL=(ALL) NOPASSWD:ALLchpasswd:
+    lock_passwd: false
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+chpasswd:
  list: |
-   nutanix: Biloute02!03
+   admin:changeme
  expire: False
 write_files:
   - path: /etc/sysconfig/network-scripts/ifcfg-eth0
@@ -23,7 +22,7 @@ write_files:
       TYPE=Ethernet
       ONBOOT=yes
       BOOTPROTO=none
-      IPADDR=192.168.13.102
+      IPADDR=192.168.13.100
       NETMASK=255.255.255.0
       GATEWAY=192.168.13.1
       DOMAIN=int.virtualy-labs.com
@@ -33,3 +32,25 @@ runcmd:
   - systemctl stop NetworkManager kdump
   - systemctl enable network.service
   - systemctl restart network
+yum_repos:
+# The name of the repository
+  epel-testing:
+    # Any repository configuration options
+    # See: man yum.conf
+    #
+    # This one is required!
+    baseurl: http://download.fedoraproject.org/pub/epel/testing/7/$basearch
+    enabled: false
+    failovermethod: priority
+    gpgcheck: true
+    gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL
+    name: Extra Packages for Enterprise Linux 7 - Testing
+ # update all installed packages
+package_upgrade: true
+
+# install Apache and PostgreSQL
+packages:
+  - httpd
+  - php
+  - postgresql
+  - postgresql-server
