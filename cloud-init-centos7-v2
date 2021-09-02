@@ -1,3 +1,7 @@
+#cloud-config
+password: changeme
+disable_root: False
+ssh_pwauth: True
 hostname: test01-ci
 fqdn: test01-ci.int.virtualy-labs.com
 manage_etc_hosts: true
@@ -10,21 +14,11 @@ users:
 chpasswd:
  list: |
    admin:changeme
+ write_files:
+  - path: /home/admin/testFile
+    content: |
+      toto
  expire: False
-network:
-  version: 2
-  ethernets:
-    eth0:
-      # match:
-      #   name: eth0
-      # dhcp4: false
-      # dhcp6: false
-      addresses: 
-        - 192.168.13.109/24
-      gateway4: 192.168.13.1
-      nameservers:
-        search: [int.virtualy-labs.com]
-        addresses: [192.168.1.31]
   # install Apache 
 packages:
   - httpd
