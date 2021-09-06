@@ -2,8 +2,8 @@
 password: changeme
 disable_root: False
 ssh_pwauth: True
-hostname: VM-LYON-01-WEB01
-fqdn: VM-LYON-01-WEB01.int.virtualy-labs.com
+hostname: VM-LYON-01-SQL01
+fqdn: VM-LYON-01-SQL01.int.virtualy-labs.com
 manage_etc_hosts: true
 users:
   - name: "admin"
@@ -21,7 +21,10 @@ chpasswd:
  expire: False
   # install Apache 
 packages:
-  - httpd
+#  - httpd
+  - mysql-server
+  - mysql-client
+  - libmysqlclient-dev
 runcmd:
-  - [ systemctl, enable, httpd.service ]
-  - [ systemctl, start, httpd.service ]
+  - [ systemctl, enable, mysqld.service ]
+  - [ systemctl, start, mysqld.service ]
